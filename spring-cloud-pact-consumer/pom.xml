@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.1.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.example</groupId>
+	<artifactId>spring-cloud-pact-shareapp-consumer</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>spring-cloud-pact-consumer</name>
+	<description>
+	参看
+	https://github.com/DiUS/pact-jvm/tree/master/pact-jvm-provider-maven#publishing-pact-files-to-a-pact-broker-version-320
+	</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+	
+		<dependency>
+	      <groupId>junit</groupId>
+		  <artifactId>junit</artifactId>
+	      <scope>test</scope>
+	    </dependency>
+	    
+	    <dependency>
+		    <groupId>au.com.dius</groupId>
+		    <artifactId>pact-jvm-consumer-junit_2.11</artifactId>
+		    <version>3.3.3</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- lombok省列get/set -->
+	    <dependency>
+	        <groupId>org.projectlombok</groupId>
+	        <artifactId>lombok</artifactId>
+	        <scope>provided</scope>
+	    </dependency>
+	    
+	    <dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>fluent-hc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+		</dependency>
+	</dependencies>
+  	<!--第三方maven私服 -->
+	<repositories>
+		<repository>
+			<id>nexus-aliyun</id>
+			<name>Nexus aliyun</name>
+			<url>http://maven.aliyun.com/nexus/content/groups/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>nexus-aliyun</id>
+			<name>Nexus aliyun</name>
+			<url>http://maven.aliyun.com/nexus/content/groups/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+	
+	<build>
+		<plugins>
+		 	<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!-- 发布契约
+			项目根目录命令行执行 
+			发布单个
+			mvn clean test pact:publish -Dtest=com.example.demo.testPostPactTest
+			发布所有
+			mvn pact:publish 
+			-->
+			<plugin>
+			    <groupId>au.com.dius</groupId>
+			    <artifactId>pact-jvm-provider-maven_2.11</artifactId>
+			    <version>3.5.5</version>
+			    <configuration>
+				   <pactDirectory>target/pacts</pactDirectory> <!-- Defaults to ${project.build.directory}/pacts -->
+				   <pactBrokerUrl>http://192.168.1.4:8200/</pactBrokerUrl>
+				   <projectVersion>${project.version}</projectVersion> <!-- Defaults to ${project.version} -->
+				   <trimSnapshot>true</trimSnapshot> <!-- Defaults to false -->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
