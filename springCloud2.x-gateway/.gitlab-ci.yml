@@ -1,0 +1,36 @@
+variables:
+  PACKAGE_JAR: "springCloud2.x-gateway-0.0.1-SNAPSHOT"
+
+stages:
+  - build
+  - run
+  
+build:
+  image: maven:3-jdk-8
+  stage: build
+  tags:
+    - cloudgateway
+  script: "mvn package -B -Dmaven.test.skip=true"
+  artifacts:
+    paths:
+      - target/*.jar
+
+deploy_qa:
+  image: maven:3-jdk-8			#此镜像包含ssh相应命令
+  stage: run
+  tags:			#对应的执行起默认需要个tag
+    - cloudgateway
+  before_script:  #全局的话每个步骤都会执行
+    - eval $(ssh-agent -s)
+    # 清除一些系统中复制出现的换行符\r，并重定向到/dev/null防止泄露
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    # 创建~/.ssh目录，并配置权限(非root运行的runner)
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan 192.168.1.4 >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - scp -o StrictHostKeyChecking=no -P 68 target/$PACKAGE_JAR.jar root@192.168.1.4:/home/work/
+    - scp -o StrictHostKeyChecking=no -P 68 entry.sh root@192.168.1.4:/home/work/
+    #-o StrictHostKeyChecking=no 禁止命令行询问密码 work 目录给与执行权限chmod 777 work/*
+    - ssh -o StrictHostKeyChecking=no -p 68 root@192.168.1.4 "cd /home/work/ ; ./entry.sh"  

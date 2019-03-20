@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: springcloud2-x-gateway
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: springcloud2-x-gateway
+    spec:
+      containers:
+      - name: springcloud2-x-gateway
+        image: 192.168.1.4:5000/springcloud2-x-gateway
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9090
+      imagePullSecrets:
+        - name: 192.168.1.4:5000
